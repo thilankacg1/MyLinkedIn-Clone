@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
 import { Article, Chat, Photo } from "@mui/icons-material";
+import FlipMove from "react-flip-move";
 import Post from "./post";
 import firebase from "firebase/compat/app";
-import ButtonSection from "./buttonSection"
+import ButtonSection from "./buttonSection";
 
 import "./feed.css";
 import { db } from "../../firebase";
@@ -11,9 +12,8 @@ import { useSelector } from "react-redux";
 import { selectUser } from "../../reducers/userSlice";
 
 const Feed = () => {
+  const user = useSelector(selectUser);
 
-    const user = useSelector(selectUser)
-    
   const sortBySection = () => {
     return (
       <div className="feed__sortBySection">
@@ -25,35 +25,36 @@ const Feed = () => {
   const [input, setInput] = useState("");
 
   useEffect(() => {
-    db.collection("feed").orderBy('timestamp', 'desc').onSnapshot((snapshot) =>
-      setPosts(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          data: doc.data(),
-        }))
-      )
-    );
+    db.collection("postList")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) =>
+        setPosts(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            data: doc.data(),
+          }))
+        )
+      );
   }, []);
 
   const sendPost = (e) => {
     e.preventDefault();
-    db.collection("feed").add({
+    db.collection("postList").add({
       name: user.displayName,
       description: user.email,
       title: input,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      photoUrl:user.photoUrl,
-      postImage:""
+      photoUrl: user.photoUrl,
+      postImage: "",
     });
     setInput("");
-
   };
 
   return (
     <div className="feed">
       <div className="feed__inputContainer">
         <div className="feed__input">
-          <Avatar src={user.photoUrl} className="feed__avatar" >
+          <Avatar src={user.photoUrl} className="feed__avatar">
             {user.email[0].toUpperCase()}
           </Avatar>
           <form onSubmit={sendPost}>
@@ -67,12 +68,13 @@ const Feed = () => {
           </form>
         </div>
         <div className="feed__buttonSection">
-            <ButtonSection label= "Media"
-            Icon={Photo} color="#378fe9"/>
-            <ButtonSection label= "Contribute expertise"
-            Icon={Chat} color="#c37d16"/>
-            <ButtonSection label= "Write article"
-            Icon={Article} color="#e06847"/>
+          <ButtonSection label="Media" Icon={Photo} color="#378fe9" />
+          <ButtonSection
+            label="Contribute expertise"
+            Icon={Chat}
+            color="#c37d16"
+          />
+          <ButtonSection label="Write article" Icon={Article} color="#e06847" />
         </div>
       </div>
       {sortBySection()}
@@ -81,18 +83,19 @@ const Feed = () => {
           id,
           data: { title, name, timestamp, description, photoUrl, postImage },
         }) => (
-          <Post
-            key={id}
-            title={title}
-            name={name}
-            description={description}
-            timestamp={timestamp}
-            photoUrl={photoUrl}
-            postImage={postImage}
-          />
+          <FlipMove>
+            <Post
+              key={id}
+              title={title}
+              name={name}
+              description={description}
+              timestamp={timestamp}
+              photoUrl={photoUrl}
+              postImage={postImage}
+            />
+          </FlipMove>
         )
       )}
-
     </div>
   );
 };
