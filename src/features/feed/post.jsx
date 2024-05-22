@@ -1,14 +1,14 @@
-import React from "react";
+import React, {forwardRef} from "react";
 import { Avatar } from "@mui/material";
 import { Share } from "@mui/icons-material";
 import defaultImg from "../../app/assets/default.png";
 import ButtonSection from "./buttonSection";
 import { ThumbUpSharp, Comment, Send } from "@mui/icons-material";
 
-const Post = ({ title, name, description,photoUrl, postImage }) => {
+const Post = forwardRef(({ title, name, description,photoUrl, postImage }, ref) => {
 
   return (
-    <div className="feed__post">
+    <div ref={ref} className="feed__post">
       <div className="feed__postHeader">
         <div className="feed__postHeaderTop">
           <div className="feed__postHeaderTop__icon">
@@ -41,6 +41,6 @@ const Post = ({ title, name, description,photoUrl, postImage }) => {
       </div>
     </div>
   );
-};
+});
 
 export default Post;
